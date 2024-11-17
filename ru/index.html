@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='description' content='X-GORB Official Russian Website - Простой, стильный, технический, исследующий бесконечные возможности.'>
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-GORB Search - Простой, стильный, технический, исследующий бесконечные возможности.</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        #search-container.hidden {
+            transform: translateY(-100%);
+        }
+        #logo {
+            height: 40px;
+            margin-right: 20px;
+        }
+        #query {
+            width: 50%;
+            max-width: 600px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        #query:focus {
+            border-color: #4285f4;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #4285f4;
+            color: white;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        .search-type-button {
+            padding: 5px 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #333;
+            margin-left: 10px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .search-type-button.active {
+            background-color: #4285f4;
+            color: white;
+            border-color: #4285f4;
+        }
+        .search-type-button:hover {
+            background-color: #e0e0e0;
+        }
+        .search-type-button.active:hover {
+            background-color: #357ae8;
+            border-color: #357ae8;
+        }
+        #results {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 120px; /* Adjust for fixed search bar and buttons */
+        }
+        .result-item, .image-result {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .result-item:hover, .image-result:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .result-title, .image-result h3 {
+            font-size: 1.2em;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .result-snippet {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .image-result img {
+            width: 100%;
+            border-radius: 8px;
+            transition: opacity 0.3s ease;
+        }
+        .image-result img:hover {
+            opacity: 0.8;
+        }
+        .error-message {
+            color: red;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        #load-more {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #4285f4;
+            color: white;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        #load-more:hover {
+            background-color: #357ae8;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div id="search-container" class="hidden">
+        <img id="logo" src="logo.png" alt="Logo">
+        <input type="text" id="query" placeholder="Пожалуйста, введите поиск...">
+        <button onclick="performSearch()">Искать</button>
+    </div>
+    <ul id="results"></ul>
+    <button id="load-more" style="display:none;" onclick="loadMoreResults()">Показать больше результатов поиска</button>
+
+    <footer>
+        <p>© 2024 X-GORB Studio. All rights reserved.</p>
+        <p>Контакт: jubao@xgorb.cn</p>
+        <p>X-GORB Search не несет ответственности за незаконные веб-страницы.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchContainer = document.getElementById('search-container');
+            searchContainer.classList.remove('hidden');
+
+            // Focus on the input field when the page loads
+            document.getElementById('query').focus();
+        });
+
+        let currentSearchType = 'web';
+        let currentPage = 1;
+
+        function setSearchType(type) {
+            const webButton = document.querySelector('.search-type-button.web');
+            const imagesButton = document.querySelector('.search-type-button.images');
+
+            if (type === 'web') {
+                webButton.classList.add('active');
+                imagesButton.classList.remove('active');
+            } else if (type === 'images') {
+                imagesButton.classList.add('active');
+                webButton.classList.remove('active');
+            }
+
+            currentSearchType = type;
+            resetAndPerformSearch();
+        }
+
+        function performSearch() {
+            resetAndPerformSearch();
+        }
+
+        function resetAndPerformSearch() {
+            currentPage = 1;
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            document.getElementById('load-more').style.display = 'none';
+            fetchResults(currentPage);
+        }
+
+        function loadMoreResults() {
+            currentPage++;
+            fetchResults(currentPage);
+        }
+
+        async function fetchResults(page) {
+            const query = document.getElementById('query').value;
+            if (!query) return;
+
+            if (currentSearchType === 'web') {
+                await fetchWebResults(query, page);
+            } else if (currentSearchType === 'images') {
+                await fetchImageResults(query, page);
+            }
+        }
+
+        async function fetchWebResults(query, page) {
+            const endpoint = 'https://api.allorigins.win/get';
+            const params = new URLSearchParams({
+                url: `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}&kl=us-en&s=&dc=&s=${(page - 1) * 30}`
+            });
+
+            try {
+                const response = await fetch(`${endpoint}?${params}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+                const results = Array.from(doc.querySelectorAll('.result'));
+
+                displayWebResults(results, page);
+            } catch (error) {
+                console.error('Error fetching web search results:', error);
+                displayErrorMessage('Не удается получить результаты веб-поиска, проверить сетевое подключение или повторить попытку позже.');
+            }
+        }
+
+        function displayWebResults(results, page) {
+            const resultsContainer = document.getElementById('results');
+
+            if (results.length === 0 && page === 1) {
+                displayErrorMessage('Релевантные результаты поиска в Интернете не найдены.');
+                return;
+            }
+
+            results.forEach(result => {
+                const titleElement = result.querySelector('.result__title a');
+                const snippetElement = result.querySelector('.result__snippet');
+
+                if (!titleElement || !snippetElement) return;
+
+                let url = titleElement.getAttribute('href');
+                if (!url.startsWith('http')) {
+                    url = 'https:' + url; // Convert relative URL to absolute URL
+                }
+
+                // Remove duckduckgo redirection prefix and any &rut= parameter
+                const duckDuckGoPrefix = 'https://duckduckgo.com/l/?uddg=';
+                if (url.startsWith(duckDuckGoPrefix)) {
+                    url = decodeURIComponent(url.substring(duckDuckGoPrefix.length));
+                }
+                url = url.split('&rut=')[0];
+
+                const domain = new URL(url).hostname;
+
+                const title = titleElement.textContent.trim();
+                const snippet = snippetElement.textContent.trim();
+
+                const resultItem = document.createElement('li');
+                resultItem.className = 'result-item';
+                resultItem.onclick = () => window.open(url, '_blank');
+
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'result-title';
+                titleEl.textContent = title;
+                resultItem.appendChild(titleEl);
+
+                const snippetEl = document.createElement('p');
+                snippetEl.className = 'result-snippet';
+                snippetEl.textContent = snippet;
+                resultItem.appendChild(snippetEl);
+
+                resultsContainer.appendChild(resultItem);
+            });
+
+            document.getElementById('load-more').style.display = 'block';
+        }
+
+        async function fetchImageResults(query, page) {
+            const endpoint = 'https://api.duckduckgo.com/';
+            const params = new URLSearchParams({
+                q: query,
+                format: 'json',
+                pretty: 1,
+                size: 'medium', // Medium-sized images
+                offset: (page - 1) * 30, // Offset for pagination
+                limit: 30, // Limit per page
+            });
+
+            try {
+                const response = await fetch(`${endpoint}?${params}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const imageResults = data.Results;
+
+                displayImageResults(imageResults, page);
+            } catch (error) {
+                console.error('Error fetching image search results:', error);
+                displayErrorMessage('Не удается получить результаты поиска изображений, проверить подключение к сети или повторить попытку позже.');
+            }
+        }
+
+        function displayImageResults(results, page) {
+            const resultsContainer = document.getElementById('results');
+
+            if (results.length === 0 && page === 1) {
+                displayErrorMessage('Релевантные результаты поиска изображений не найдены.');
+                return;
+            }
+
+            results.forEach(result => {
+                const thumbnail = result.Thumbnail;
+                const imageUrl = result.Image;
+                const title = result.Title;
+
+                const resultItem = document.createElement('li');
+                resultItem.className = 'image-result';
+                resultItem.onclick = () => window.open(imageUrl, '_blank');
+
+                const imageEl = document.createElement('img');
+                imageEl.src = thumbnail;
+                imageEl.alt = title;
+                resultItem.appendChild(imageEl);
+
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'result-title';
+                titleEl.textContent = title;
+                resultItem.appendChild(titleEl);
+
+                resultsContainer.appendChild(resultItem);
+            });
+
+            document.getElementById('load-more').style.display = 'block';
+        }
+
+        function displayErrorMessage(message) {
+            const errorMessageEl = document.createElement('div');
+            errorMessageEl.className = 'error-message';
+            errorMessageEl.textContent = message;
+            document.getElementById('results').appendChild(errorMessageEl);
+        }
+    </script>
+</body>
+</html>
