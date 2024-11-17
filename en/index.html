@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name='description' content='X-GORB Search English Official Website - Simple, stylish, technological, and explore infinite possibilities'>
+    <meta name='description' content='X-GORB Search English Official Website - Simplicity, Fashion, Technology, Exploring Unlimited Possibilities'>
     <link rel="shortcut icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-GORB Search - Simple, stylish, technological, and explore endless possibilities</title>
+    <title>X-GORB Search - Simplicity, Fashion, Technology, Explore Unlimited Possibilities</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -169,16 +169,16 @@
 <body>
     <div id="search-container" class="hidden">
         <img id="logo" src="logo.png" alt="Logo">
-        <input type="text" id="query" placeholder="Please enter your search...">
-        <button onclick="performSearch()">Search</button>
+        <input type="text" id="query" placeholder="Please enter search content">
+        <button onclick="performSearch()">搜索</button>
     </div>
     <ul id="results"></ul>
-    <button id="load-more" style="display:none;" onclick="loadMoreResults()">Show more</button>
+    <button id="load-more" style="display:none;" onclick="loadMoreResults()">Show more search results</button>
 
     <footer>
         <p>© 2024 X-GORB Studio. All rights reserved.</p>
-        <p>Contact us: jubao@xgorb.cn</p>
-        <p>X-GORB Search is not responsible for the illegal web pages</p>
+        <p>contact us: jubao@xgorb.cn</p>
+        <p>X-GORB is not responsible for searching for illegal web pages</p>
     </footer>
 
     <script>
@@ -257,7 +257,7 @@
                 displayWebResults(results, page);
             } catch (error) {
                 console.error('Error fetching web search results:', error);
-                displayErrorMessage('Can't get web search results, check your network connection or try again later.');
+                displayErrorMessage('无法获取网页搜索结果，请检查网络连接或稍后再试。');
             }
         }
 
@@ -265,7 +265,7 @@
             const resultsContainer = document.getElementById('results');
 
             if (results.length === 0 && page === 1) {
-                displayErrorMessage('No relevant web search results found.');
+                displayErrorMessage('没有找到相关网页搜索结果。');
                 return;
             }
 
@@ -335,7 +335,7 @@
                 displayImageResults(imageResults, page);
             } catch (error) {
                 console.error('Error fetching image search results:', error);
-                displayErrorMessage('Can't get image search results, check your network connection or try again later.');
+                displayErrorMessage('无法获取图片搜索结果，请检查网络连接或稍后再试。');
             }
         }
 
@@ -343,7 +343,7 @@
             const resultsContainer = document.getElementById('results');
 
             if (results.length === 0 && page === 1) {
-                displayErrorMessage('No relevant image search results found.');
+                displayErrorMessage('没有找到相关图片搜索结果。');
                 return;
             }
 
